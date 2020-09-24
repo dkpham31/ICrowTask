@@ -92,7 +92,7 @@ passport.use(
       clientID:
         "947037627001-49cr4as1of8mv15u1pf7q0g2c19oekar.apps.googleusercontent.com",
       clientSecret: "iNzP7dPrESLMF3pD_7YRfYd0",
-      callbackURL: "https://icrowtaskworkers.herokuapp.com/google/callback",
+      callbackURL: "https://icrowtask.herokuapp.com/google/callback",
     },
     async (accessToken, refreshToken, profile, done) => {
       const newUser = {
