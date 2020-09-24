@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="google-signin-client_id" content="YOUR_CLIENT_ID.apps.googleusercontent.com">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <title>iCrowdTask SignIn</title>
+
+  <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+  <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.8/css/all.css">
+
+
+
+</head>
+
+<body>
+
+
+  <div class="container">
+    <hr>
+    <div class="row">
+      <aside class="col-sm-4">
+        <h4 class="card-title mb-4 mt-1">iCrowdTask Reset</h4>
+        <div class="card">
+          <article class="card-body">
+
+            <h4 class="card-title mb-4 mt-1" id="messageOne">ChangePassword</h4>
+            <form action="/reset" method="post">
+              <div class="form-group">
+                <label>Your password</label>
+                <input name="password" required class="form-control" minlength="8" placeholder="******" type="password">
+              </div> <!-- form-group// -->
+              <div class="form-group">
+                <label>Confirm Password</label>
+                <input class="form-control" required placeholder="******" name="cpassword" type="password">
+              </div> <!-- form-group// -->
+              <div class="form-group">
+
+                <input class="form-control" required hidden name="token" value="{{token}}" type="text">
+                <div class="form-group">
+                  <button type="submit" class="btn btn-primary btn-block"> Change Password </button>
+
+                </div> <!-- form-group// -->
+
+
+
+                <p hidden>work</p>
+            </form>
+          </article>
+
+        </div> <!-- card.// -->
+</body>
+
+</html>

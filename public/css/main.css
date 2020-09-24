@@ -1,0 +1,44 @@
+h1 {
+  color: #0B66AD;
+  text-align: center;
+}
+h3 {
+  text-align: center;
+  align-items: center;
+}
+label {
+  color: #2131F7;
+}
+
+.col {
+  padding-top: 30px;
+}
+.register_form {
+  margin: auto;
+  width: 500px;
+  border: solid;
+  padding: 15px;
+}
+.firstname {
+  position: relative;
+  top: 20px;
+  left: -84px;
+}
+.lastname {
+  position: relative;
+  left: 240px;
+}
+.fill {
+  width: 100%;
+}
+.button {
+  text-align: center;
+  padding: 25px;
+}
+button {
+  background-color: #4991CB;
+  padding: 5px;
+  font-style: initial;
+  font-size: 15px;
+  color: antiquewhite;
+}
