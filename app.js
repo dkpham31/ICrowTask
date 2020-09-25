@@ -6,6 +6,10 @@ const User = require("./models/user");
 const app = express();
 
 var bcrypt = require("bcrypt");
+var LocalStrategy = require("passport-local").Strategy;
+var GoogleStrategy = require("passport-google-oauth").OAuth2Strategy;
+var nodemailer = require("nodemailer");
+var crypto = require("crypto");
 
 const path = require("path");
 const { json } = require("body-parser");
@@ -16,10 +20,6 @@ const { workers } = require("cluster");
 const passport = require("passport");
 const session = require("express-session");
 
-var LocalStrategy = require("passport-local").Strategy;
-var GoogleStrategy = require("passport-google-oauth").OAuth2Strategy;
-var nodemailer = require("nodemailer");
-var crypto = require("crypto");
 
 mongoose.set("useFindAndModify", false);
 
@@ -35,6 +35,7 @@ const publicDirectoryPath = path.join(__dirname);
 app.set("view engine", "hbs");
 app.use(express.static(publicDirectoryPath));
 
+//node mailer account, I borrow my friend account because my account has 2 steps authentication
 var transporter = nodemailer.createTransport({
   service: "gmail",
   port: 465,
@@ -56,6 +57,7 @@ app.use(
   })
 );
 
+//use passport for authentication
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -71,6 +73,7 @@ passport.deserializeUser(function (id, done) {
   });
 });
 
+// authentication for login
 passport.use(
   new LocalStrategy(
     { usernameField: "email", passwordField: "password" },
@@ -95,6 +98,7 @@ passport.use(
   )
 );
 
+//authentication for login by Google account
 passport.use(
    new GoogleStrategy(
     {
@@ -170,6 +174,7 @@ app.get("/SignUp", (req, res) => {
   res.sendFile(__dirname + "/SignUp.html");
 });
 
+//mongodb link access
 mongoose.connect(
   "mongodb+srv://dkpham:Bietlamchi3110@dkpham.a80mn.mongodb.net/iCrowdTask?retryWrites=true&w=majority",
   { useNewUrlParser: true, useUnifiedTopology: true }
@@ -190,6 +195,7 @@ app.get(
   }
 );
 
+//Login
 app.post("/", (req, res) => {
   const email = req.body.Email_signin;
   const password = req.body.password_signin;
@@ -218,7 +224,7 @@ app.post(
   })
 );
 
-//reset password
+//Reset account password
 
 app.post("/forgot", async function (req, res) {
   const email = req.body.email;
@@ -257,7 +263,7 @@ app.post("/forgot", async function (req, res) {
               return res.send(error);
             } else {
               console.log("Email sent: " + info.response);
-              return res.send("Please Check your email to reset your password");
+              return res.send("Please check your email to reset your password");
             }
           });
         }
@@ -299,7 +305,7 @@ app.post("/reset", (req, res) => {
   }
 });
 
-//SingUp
+//SingUp functiion
 
 app.post("/SignUp", (req, res) => {
   const countries = req.body.countries;
@@ -328,6 +334,8 @@ app.post("/SignUp", (req, res) => {
       },
     ],
   };
+  
+  // mailchimp access 
   jsonData = JSON.stringify(data);
   const api = "0bc59e44507030c7b49675b2007cf214-us17";
   const id_list = "074aa3f87f";
@@ -386,7 +394,7 @@ app.post("/SignUp", (req, res) => {
   }
 });
 
-//Restful API
+//Restful API task worker
 app
   .route("/workers")
   .get((req, res) => {

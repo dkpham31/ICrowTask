@@ -8,6 +8,7 @@
 <title>iCrowdTask SignIn</title>
 
 <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+
 <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 
@@ -21,28 +22,38 @@
   <hr>
   <div class="row">
     <aside class="col-sm-4">
+	
       <h4 class="card-title mb-4 mt-1">iCrowdTask Login</h4>
+	  
   <div class="card">
   <article class="card-body">
   <a href="SignUp.html" class="float-right btn btn-outline-primary">Sign up</a>
+  
   <h4 class="card-title mb-4 mt-1">Sign in</h4>
+  
      <form action="/" method="post">
       <div class="form-group">
         <label>Your email</label>
+		
           <input name="Email_signin" require class="form-control" placeholder="Email" type="email">
       </div> 
       <div class="form-group">
         <a class="float-right" href="/forgot.html">Forgot?</a>
+		
         <label>Your password</label>
+		
           <input class="form-control" require placeholder="******" name="password_signin" type="password">
       </div>  
       <div class="form-group"> 
       <div class="checkbox">
+	  
         <label> <input type="checkbox"> Save password </label>
       </div> 
       </div>  
+	  
       <div class="form-group">
           <button type="submit" class="btn btn-primary btn-block"> Login  </button>
+		  
 		  <a href="/auth/google" class="btn btn-primary btn-block">Sign in with Google</a>
          </div>                                                           
   </form>
