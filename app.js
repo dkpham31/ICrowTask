@@ -2,22 +2,27 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const Register = require("./models/register");
+const User = require("./models/user");
 const app = express();
-const path = require("path");
+
 var bcrypt = require("bcrypt");
-const e = require("express");
+
+const path = require("path");
 const { json } = require("body-parser");
 const saltRounds = 10;
 const https = require("https");
-const { response } = require("express"); 
+const { response } = require("express");
 const { workers } = require("cluster");
+const passport = require("passport");
+const session = require("express-session");
+
 var LocalStrategy = require("passport-local").Strategy;
 var GoogleStrategy = require("passport-google-oauth").OAuth2Strategy;
 var nodemailer = require("nodemailer");
-const passport = require("passport");
-const session = require("express-session");
 var crypto = require("crypto");
+
 mongoose.set("useFindAndModify", false);
+
 app.use(bodyParser.json());
 app.use(bodyParser.text());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -26,6 +31,7 @@ app.use(express.static("public"));
 app.use(express.static(__dirname));
 
 const publicDirectoryPath = path.join(__dirname);
+
 app.set("view engine", "hbs");
 app.use(express.static(publicDirectoryPath));
 
@@ -34,11 +40,10 @@ var transporter = nodemailer.createTransport({
   port: 465,
   secure: true,
   auth: {
-    user: "youremail@gmail.com",
-    pass: "abcdefwg",
+    user: "thantqkhai@gmail.com",
+    pass: "kylethan1105",
   },
   tls: {
-    // do not fail on invalid certs
     rejectUnauthorized: true,
   },
 });
@@ -50,8 +55,10 @@ app.use(
     secret: "$$$DeakinSecret",
   })
 );
+
 app.use(passport.initialize());
 app.use(passport.session());
+
 passport.use(Register.createStrategy());
 
 passport.serializeUser(function (user, done) {
@@ -63,6 +70,7 @@ passport.deserializeUser(function (id, done) {
     done(err, user);
   });
 });
+
 passport.use(
   new LocalStrategy(
     { usernameField: "email", passwordField: "password" },
@@ -86,8 +94,9 @@ passport.use(
     }
   )
 );
+
 passport.use(
-  new GoogleStrategy(
+   new GoogleStrategy(
     {
       clientID:
         "947037627001-49cr4as1of8mv15u1pf7q0g2c19oekar.apps.googleusercontent.com",
@@ -132,6 +141,7 @@ passport.use(
 app.get("/", (req, res) => {
   res.sendFile(__dirname + "/index.html");
 });
+
 app.get("/success", (req, res) => {
   if (req.isAuthenticated()) {
     res.sendFile(__dirname + "/success.html");
@@ -141,12 +151,13 @@ app.get("/success", (req, res) => {
 });
 
 app.get("/forgot", (req, res) => {
-  res.sendFile(__dirname + "/forgotpassword.html");
+  res.sendFile(__dirname + "/forgot.html");
 });
+
 app.get("/reset/:token", (req, res) => {
   Register.findOne({ password_token: req.params.token }, (err, user) => {
     if (!user) {
-      return res.send("Invalid user, we cannot find you");
+      return res.send("Invalid user, we can not find you");
     }
 
     res.render("reset", {
@@ -158,16 +169,19 @@ app.get("/reset/:token", (req, res) => {
 app.get("/SignUp", (req, res) => {
   res.sendFile(__dirname + "/SignUp.html");
 });
+
 mongoose.connect(
   "mongodb+srv://dkpham:Bietlamchi3110@dkpham.a80mn.mongodb.net/iCrowdTask?retryWrites=true&w=majority",
   { useNewUrlParser: true, useUnifiedTopology: true }
 );
+
 app.get(
   "/auth/google",
   passport.authenticate("google", {
     scope: ["profile", "email"],
   })
 );
+
 app.get(
   "/google/callback",
   passport.authenticate("google", { failureRedirect: "/" }),
@@ -176,6 +190,26 @@ app.get(
   }
 );
 
+app.post("/", (req, res) => {
+  const email = req.body.Email_signin;
+  const password = req.body.password_signin;
+  const hashPassword = bcrypt.hashSync(password, saltRounds);
+  const register = new Register();
+  Register.findOne({ email: email }, async function (err, doc) {
+    if (err) {
+      res.send("<h1>nah </h1>");
+    } else {
+      if (doc == null) {
+        return res.send("<h1>Invalid User<h1>");
+      }
+      const isMatch = await bcrypt.compare(password, doc.password);
+      if (!isMatch) {
+        return res.send("<h1>Invalid Password</h1>");
+      }
+      res.sendFile(__dirname + "/success.html");
+    }
+  });
+}); 
 app.post(
   "/",
   passport.authenticate("local", {
@@ -184,7 +218,7 @@ app.post(
   })
 );
 
-
+//reset password
 
 app.post("/forgot", async function (req, res) {
   const email = req.body.email;
@@ -205,10 +239,10 @@ app.post("/forgot", async function (req, res) {
           }
           var mailOptions = {
             to: email,
-            from: "khoaphamdang31@gmail.com",
-            subject: "Sending email to reset your password",
+            from: "thantqkhai@gmail.com",
+            subject: "Sending email to reset your account password",
             text:
-              "Click on this link to reset your account password. \n \n" +
+              "Please follow this link to reset your password. \n \n" +
               "http://" +
               req.headers.host +
               "/reset/" +
@@ -219,11 +253,11 @@ app.post("/forgot", async function (req, res) {
             if (error) {
               console.log(error);
               var k;
-              // return res.sendFile(__dirname + "/404.html");
+              // return res.sendFile(__dirname + "/eror404.html");
               return res.send(error);
             } else {
               console.log("Email sent: " + info.response);
-              return res.send("Please check your email to reset password");
+              return res.send("Please Check your email to reset your password");
             }
           });
         }
@@ -234,7 +268,7 @@ app.post("/forgot", async function (req, res) {
   });
 });
 
-app.post("/Reset", (req, res) => {
+app.post("/reset", (req, res) => {
   const password = req.body.password;
   const cpassword = req.body.cpassword;
   const token = req.body.token;
@@ -243,7 +277,7 @@ app.post("/Reset", (req, res) => {
   console.log(token);
   try {
     if (password != cpassword) {
-      return res.send("<h3> Your password does not match </h3>");
+      return res.send("<h3> password does not match </h3>");
     }
 
     Register.findOneAndUpdate(
@@ -265,21 +299,23 @@ app.post("/Reset", (req, res) => {
   }
 });
 
+//SingUp
+
 app.post("/SignUp", (req, res) => {
   const countries = req.body.countries;
   const firstname = req.body.fname;
   const lastname = req.body.lname;
   const email = req.body.email;
   const password = req.body.password;
-  const confirmpassword = req.body.confirmpassword;
+  const cpassword = req.body.cpassword;
   const address = req.body.address1 + req.body.address2;
   const city = req.body.city;
   const state = req.body.state;
   const zip = req.body.zip;
   const phone = req.body.phone;
   const hashPassword = bcrypt.hashSync(password, saltRounds);
-  const hashConfirmPassword = bcrypt.hashSync(confirmpassword, saltRounds);
-  
+  const hashCPassword = bcrypt.hashSync(cpassword, saltRounds);
+
   const data = {
     members: [
       {
@@ -309,28 +345,30 @@ app.post("/SignUp", (req, res) => {
 
   request.write(jsonData);
   request.end();
+
   console.log(firstname, lastname, email);
-  
+
   const register = new Register({
     googleId: "empty",
-	username:: firstname,
-	coutries: countries,
+    username: firstname,
+    coutries: countries,
     fname: firstname,
     lname: lastname,
     email: email,
     password: hashPassword,
-    confirmpassword: hashConfirmPassword,
     address: address,
     city: city,
     state: state,
     zip: zip,
     mobile: phone,
-	password_token: null,
+    password_token: null,
   });
+  
   try {
-    if (password != confirmpassword) {
-      return res.send("<h3> Your password does not match </h3>");
+    if (password != cpassword) {
+      return res.send("<h3> password does not match </h3>");
     }
+
     register
       .save()
       .then((register) => {
@@ -348,6 +386,7 @@ app.post("/SignUp", (req, res) => {
   }
 });
 
+//Restful API
 app
   .route("/workers")
   .get((req, res) => {
@@ -399,7 +438,7 @@ app
       if (err) {
         return res.send(err);
       }
-      res.send("Successfully");
+      res.send("successful");
     });
   })
   .patch((req, res) => {
@@ -410,7 +449,7 @@ app
         if (err) {
           return res.send(err);
         } else {
-          res.send("Successfully");
+          res.send("updated successfully");
         }
       }
     );
@@ -420,10 +459,15 @@ app
       if (err) {
         return res.send(err);
       }
-      res.send("Successfully");
+      res.send("Successfull");
     });
   });
-  
-app.listen(3000, function (request, response) {
+
+let port = process.env.PORT;
+
+if (port == null || port == "") {
+  port = 3000;
+}
+app.listen(port, function (request, response) {
   console.log("Server is running in port 3000");
 });
